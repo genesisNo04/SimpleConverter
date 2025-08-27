@@ -27,17 +27,30 @@ function Converter() {
     },
   };
 
-  const handleConvert = () => {
+  const handleConvert = async () => {
+    try {
+      const typeConvert = activeTab;
+      const url = `http://localhost:8080/${typeConvert}?value=${initialValue}&from=${fromUnit}&to=${toUnit}`
+      console.log(url);
     // For now, let's just simulate a result
-    const result = `${initialValue} ${fromUnit} = 123 ${toUnit}`;
+    const response = await fetch(url);
+    console.log(response);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const convertedValue = await response.json();
 
     // Navigate to result page and pass data
     navigate("/result", {
       state: {
         activeTab,
-        result,
+        result: `${initialValue} ${fromUnit} = ${Number(convertedValue).toFixed(2)} ${toUnit}`,
       },
     });
+    } catch (error) {
+      console.error("Erro converting value: ", error);
+      alert("Conversion failed. Check console for details.");
+    }
   };
 
   return (
